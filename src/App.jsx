@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // import { BrowserRouter, Routes } from 'react-router-dom';
 import { Canvas, useLoader } from '@react-three/fiber';
 import {Tile} from './components/Tile';
+import './App.css';
 // import { OrbitControls } from '@react-three/drei';
 
 function App() {
