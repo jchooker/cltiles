@@ -1,13 +1,14 @@
-import React, { useState, useRef } from 'react';
-import {MeshStandardMaterial,Mesh,BoxGeometry,TextureLoader, 
-    EdgesGeometry, LineSegments, LineBasicMaterial, MathUtils} from "three";
+import React, { useState, useRef, useEffect } from 'react';
+import { MeshStandardMaterial,Mesh,BoxGeometry, 
+    EdgesGeometry, LineSegments, LineBasicMaterial, MathUtils } from "three";
 import * as THREE from 'three';
 import { useLoader, useFrame, Canvas, extend, useThree } from '@react-three/fiber';
+import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { shaderMaterial, Plane, useTexture} from '@react-three/drei';
 // import {OrbitControls} from '@react-three/drei';
 // import {useDrag} from '@react-three/drei';
 
-export const Tile = ({imgUrl, size=3, radius=1}) => {
+export const Tile = (props) => {
     // const [texture, setTexture] = useState(null);
     // const [hovered, setHover] = useState(false);
     // const cubeRef = useRef();
@@ -44,7 +45,7 @@ export const Tile = ({imgUrl, size=3, radius=1}) => {
     //         .catch(error => console.error('Error loading texture: ', error));
     // }, [imgUrl]);
     const textureLoader = new TextureLoader();
-    const imgTexture = useLoader(textureLoader, imgUrl);
+    const imgTexture = useLoader(TextureLoader, props.imgUrl);
 
 
     // const {bind} = useDrag({
@@ -53,20 +54,37 @@ export const Tile = ({imgUrl, size=3, radius=1}) => {
     //         tileMesh.position.y = y;
     //     },
     //     {PointerEvent: hovered});
-    const tileGeometry = new BoxGeometry(size, Math.floor(size/2), size);
+    const tileGeometry = new BoxGeometry(props.size, Math.floor(props.size/2), props.size);
     const tileMaterial = new MeshStandardMaterial({ color: lightTanColor });
+
+    tileMaterial.map = imgTexture;
+    tileMaterial.needsUpdate = true;
     
-    const tileMesh = new Mesh(tileGeometry, tileMaterial);
+    const tileMesh = useRef();
+    useEffect(() => {
+        tileMesh.current = new Mesh(tileGeometry, tileMaterial);
+
+        //edges:
+        const edgesGeometry = new EdgesGeometry(tileGeometry);
+        const edgesMaterial = new LineBasicMaterial({ color: 0x5c4033 });
+        const edges = new LineSegments(edgesGeometry, edgesMaterial);
+
+        if (tileMesh.current) {
+            tileMesh.current.add(edges);
+            const inclination = MathUtils.degToRad(25);
+            tileMesh.current.rotation.x = inclination;
+        }
+    }, [props.size, props.imgUrl]);
     // const tileMesh = useRef();
 
-    const edgeMaterial = new MeshStandardMaterial({ color: lightTanColor });
+    // const edgeMaterial = new MeshStandardMaterial({ color: lightTanColor });
 
-    const edges = new EdgesGeometry(tileGeometry);
-    const verts = new LineSegments(
-        edges,
-        new LineBasicMaterial({ color: 0x5c4033 })
-    );
-    tileMesh.add(verts);
+    // const edges = new EdgesGeometry(tileGeometry);
+    // const verts = new LineSegments(
+    //     edges,
+    //     new LineBasicMaterial({ color: 0x5c4033 })
+    // );
+    // tileMesh.current.add(verts);
 
     //drag tools
     // const ref = useRef();
@@ -90,9 +108,6 @@ export const Tile = ({imgUrl, size=3, radius=1}) => {
     // const bottomMaterial = new MeshStandardMaterial({ color: lightTanColor });
 
     // tileMesh.material = [tileMaterial, edgeMaterial, bottomMaterial]
-
-    const inclination = MathUtils.degToRad(25);
-    tileMesh.rotation.x = inclination;
 
       // Rotate the tile for better visibility
     // useFrame(() => {
@@ -130,12 +145,17 @@ export const Tile = ({imgUrl, size=3, radius=1}) => {
                     <meshStandardMaterial attach="material" color={lightTanColor} />
                 </mesh>
             </mesh> */}
-            <mesh ref={tileMesh} geometry={tileGeometry}>
+            {/* <mesh {...props} rotation={[0, 10, 0]}>
                 <boxGeometry />
-                {[0, 1, 2, 3, 4, 5].map((index) => (
+                <meshStandardMaterial color={lightTanColor} /> */}
+                {/* <boxGeometry ref={} /> */}
+                {/* {[0, 1, 2, 3, 4, 5].map((index) => (
                     <meshStandardMaterial key={index} attachArray="material" color={lightTanColor} map={index===4 ? imgTexture : null} />
-            ))}
+            ))} */}
                 {/* <meshStandardMaterial attachArray="material" map={index===4 ? imgTexture : null} /> */}
+            {/* </mesh> */}
+            <mesh ref={tileMesh.current} >
+                <primitive object={tileMesh.current} />
             </mesh>
         </>
     );
