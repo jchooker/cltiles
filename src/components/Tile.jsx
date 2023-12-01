@@ -4,7 +4,7 @@ import { MeshStandardMaterial,Mesh,BoxGeometry,
 import * as THREE from 'three';
 import { useLoader, useFrame, Canvas, extend, useThree } from '@react-three/fiber';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
-import { shaderMaterial, Plane, useTexture} from '@react-three/drei';
+import { shaderMaterial, Plane, useTexture, Decal } from '@react-three/drei';
 // import {OrbitControls} from '@react-three/drei';
 // import {useDrag} from '@react-three/drei';
 
@@ -13,149 +13,71 @@ export const Tile = (props) => {
     // const [hovered, setHover] = useState(false);
     // const cubeRef = useRef();
     // const [isDragging, setDragging] = useState(false);
-    const lightTanColor = 0xe4d2ba;
-    // const [{x, y, z}, api] = useSpring(() => ({ x: 0, y: 0, z: 0}));
-    // const bind = useDrag(
-    //     ({ down, movement: [mx, my, mz], memo=[x.get(), y.get(), z.get()]}) => {
-    //         if (down) {
-    //             api.start({
-    //                 x: mx,
-    //                 y: Math.max(my, 0),
-    //                 z: mz,
-    //                 immediate: down,
-    //             });
-    //         } else {
-    //             api.start({y: 0});
-    //         }
-    //         return memo;
-    //     },
-    //     {pointerEvents: true}
-    //     );
-
-    // const {rayscaster} = useThree();
-    // const srfcOverlay = useLoader(THREE.TextureLoader, imgUrl);
-    // const cubeGeometry = new BoxGeometry(size, size, size);
-    // const cubeMaterial = new MeshStandardMaterial({color: 0x00ff00});
-    // const cubeMesh = new Mesh(cubeGeometry, cubeMaterial);
-
-    // useEffect(() => {
-    //     const textureLoader = new TextureLoader();
-    //     textureLoader.loadAsync(imgUrl)
-    //         .then(loadedTexture => setTexture(loadedTexture))
-    //         .catch(error => console.error('Error loading texture: ', error));
-    // }, [imgUrl]);
-    const textureLoader = new TextureLoader();
-    const imgTexture = useLoader(TextureLoader, props.imgUrl);
-
-
-    // const {bind} = useDrag({
-    //     movement: [x, y]}) => {
-    //         tileMesh.position.x = x;
-    //         tileMesh.position.y = y;
-    //     },
-    //     {PointerEvent: hovered});
-    const tileGeometry = new BoxGeometry(props.size, Math.floor(props.size/2), props.size);
-    const tileMaterial = new MeshStandardMaterial({ color: lightTanColor });
-
-    tileMaterial.map = imgTexture;
-    tileMaterial.needsUpdate = true;
-    
-    const tileMesh = useRef();
-    useEffect(() => {
-        tileMesh.current = new Mesh(tileGeometry, tileMaterial);
-
-        //edges:
-        const edgesGeometry = new EdgesGeometry(tileGeometry);
-        const edgesMaterial = new LineBasicMaterial({ color: 0x5c4033 });
-        const edges = new LineSegments(edgesGeometry, edgesMaterial);
-
-        if (tileMesh.current) {
-            tileMesh.current.add(edges);
-            const inclination = MathUtils.degToRad(25);
-            tileMesh.current.rotation.x = inclination;
+    const tileRef = useRef();
+    useFrame(() => {
+        if (tileRef.current) {
+            tileRef.current.rotation.x += 0.01;
+            tileRef.current.rotation.y += 0.01;
         }
-    }, [props.size, props.imgUrl]);
-    // const tileMesh = useRef();
+    })
+    const lightTanColor = 0xe4d2ba;
+    const darkBrownColor = 0x5c4033;
+    const prePicTestColor = 0xff0000;
 
-    // const edgeMaterial = new MeshStandardMaterial({ color: lightTanColor });
+    //  tan sides
+    const tileGeometry = new BoxGeometry(props.size, props.size/3.0, props.size);
+    const tileMaterial = new MeshStandardMaterial({ color: lightTanColor });
+    // const tileMesh = new Mesh(tileGeometry, tileMaterial);
 
-    // const edges = new EdgesGeometry(tileGeometry);
-    // const verts = new LineSegments(
-    //     edges,
-    //     new LineBasicMaterial({ color: 0x5c4033 })
-    // );
-    // tileMesh.current.add(verts);
+    //edges:
+    const edgesGeometry = new EdgesGeometry(tileGeometry);
+    const edgesMaterial = new LineBasicMaterial({ color: darkBrownColor });
+    const edges = new LineSegments(edgesGeometry, edgesMaterial);
 
-    //drag tools
-    // const ref = useRef();
+    //picture side
+    // const picTexture = useTexture(props.imgUrl);
+    // const picGeometry = new BoxGeometry(tileGeometry);
+    // const picMaterial = new MeshStandardMaterial({color: prePicTestColor});
+    // const picMesh = new Mesh(picGeometry, picMaterial);
+    const picTexture = new THREE.TextureLoader().load(props.imgUrl);
+    var create = [
+        new THREE.Vector2(0, (props.size)/3),
+        new THREE.Vector2((props.size)/2, (props.size)/3),
+        new THREE.Vector2((props.size)/2, (props.size)/(3/2)),
+        new THREE.Vector2(0, (props.size)/3)
+    ];
+  // Create materials for different faces of the box
+    const materialArray = [
+      new MeshStandardMaterial({ color: lightTanColor }), // Tan color for other faces
+      new MeshStandardMaterial({ color: lightTanColor }), // Tan color for other faces
+      new MeshStandardMaterial({ color: lightTanColor }), // Tan color for other faces
+      new MeshStandardMaterial({ color: lightTanColor }), // Tan color for other faces
+      new MeshStandardMaterial({ map: picTexture }), // Material with texture for the desired face
+      new MeshStandardMaterial({ color: lightTanColor }), // Tan color for other faces
+    ];
+      // Create a material that uses the array of materials
+    const boxMaterial = new MeshStandardMaterial({ color: 0xffffff, vertexColors: true });
+    tileMaterial.side = 2; // Three.FrontSide
 
-    // const [{x, y, z}, api] = useSpring(() => ({x: 0, y: 0, z: 0}))
+    console.log(tileGeometry);
 
-    // const bind = useDrag(({down, movement: [mx, mz]}) => {
-    //     api.start({x: down ? mx: 0, z: down ? mz : 0, immediate: down})
+    // tileGeometry.faces.forEach((face, i) => {
+    //     face.materialIndex = i === 4 ? 4 : i % 4; // Set material index based on face (use texture for face at index 4)
     // });
 
-    // useFrame((state, delta) => {
-    //     ref.current.position.x
-    // })
-    // const controls = new DragControls(objects, camera, renderer.domElement);
-    // controls.addEventListener('dragstart', (event) => {
-    //     event.object.material.emissive.set(0xaaaaaa);
-    // });
-
-    // const cubeTopMaterial = new MeshBasicMaterial({map: texture});
-
-    // const bottomMaterial = new MeshStandardMaterial({ color: lightTanColor });
-
-    // tileMesh.material = [tileMaterial, edgeMaterial, bottomMaterial]
-
-      // Rotate the tile for better visibility
-    // useFrame(() => {
-    //     if (tileMesh.current) {
-    //         tileMesh.current.rotation.x += 0.01;
-    //         tileMesh.current.rotation.y += 0.01;
-    //     }
-    // });
-
-      // useThreeSpring hook to handle animations in three.js
-    // const tileSpring = useThreeSpring({
-    //     position: [x, y, z],
-    //     config: { mass: 1, tension: 400, friction: 30 },
-    // });
-
-    // cubeMesh.material = [
-    //     new MeshStandardMaterial({ color: 0x00ff00 }), // Material for other faces
-    //     new MeshStandardMaterial({ color: 0x00ff00 }), // Material for other faces
-    //     cubeTopMaterial, // Material for the face where you want to overlay the image
-    //     new MeshStandardMaterial({ color: 0x00ff00 }), // Material for other faces
-    //     new MeshStandardMaterial({ color: 0x00ff00 }), // Material for other faces
-    //     new MeshStandardMaterial({ color: 0x00ff00 }),
-    // ];
+    // Create mesh with box geometry and the material that uses the array of materials
+    //const boxMesh = new Mesh(boxGeometry, materialArray);
+    const tileMesh = new Mesh(tileGeometry, [tileMaterial, ...materialArray]);
 
     return (
         <>
-            {/* <mesh {...bind()}>
-            {texture && <meshStandardMaterial map={texture} side={THREE.DoubleSide} />}
-                <mesh position={[x.get(), y.get(), z.get()]}>
-                    <primitive object={tileMesh}></primitive>
-                    <meshStandardMaterial attach="material" color={lightTanColor} />
-                    <meshStandardMaterial attach="material" color={lightTanColor} />
-                    <meshStandardMaterial attach="material" color={lightTanColor} />
-                    <meshStandardMaterial attach="material" color={lightTanColor} />
-                    <meshStandardMaterial attach="material" color={lightTanColor} />
-                </mesh>
-            </mesh> */}
-            {/* <mesh {...props} rotation={[0, 10, 0]}>
-                <boxGeometry />
-                <meshStandardMaterial color={lightTanColor} /> */}
-                {/* <boxGeometry ref={} /> */}
-                {/* {[0, 1, 2, 3, 4, 5].map((index) => (
-                    <meshStandardMaterial key={index} attachArray="material" color={lightTanColor} map={index===4 ? imgTexture : null} />
-            ))} */}
-                {/* <meshStandardMaterial attachArray="material" map={index===4 ? imgTexture : null} /> */}
-            {/* </mesh> */}
-            <mesh ref={tileMesh.current} >
-                <primitive object={tileMesh.current} />
+            <mesh ref={tileRef} >
+                <primitive object={tileMesh}/>
+                <primitive object={edges}/>
+                {/* <Decal debug scale={[0.5, 0.5, 0.5]}>
+                    <meshBasicMaterial map={picTexture}/>
+                </Decal> */}
+                {/* <DecalGeometry /> */}
             </mesh>
         </>
     );

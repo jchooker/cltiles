@@ -7,12 +7,12 @@ import './App.css';
 // import { OrbitControls } from '@react-three/drei';
 
 function App() {
-  const imgUrl = "https://i.ibb.co/vV6CJM4/asmodeus.png";
+  const imgUrl = "../public/serp.jpg";
   return (
     <Canvas camera={{position: [0, 0, 10], fov: 50, near: 0.1, far: 1000}}>
 
       {/* <OrbitControls></OrbitControls> */}
-      <Tile imgUrl={imgUrl} size={5}></Tile>
+      <Tile imgUrl={imgUrl} size={3.0}></Tile>
       <ambientLight intensity={5} />
       {/* <directionalLight position={[0,10,10]} /> */}
 
