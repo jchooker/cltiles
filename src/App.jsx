@@ -7,12 +7,13 @@ import './App.css';
 // import { OrbitControls } from '@react-three/drei';
 
 function App() {
-  const imgUrl = "../public/serp.jpg";
+  const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const imgUrl = "./src/assets/serp.png";
   return (
     <Canvas camera={{position: [0, 0, 10], fov: 50, near: 0.1, far: 1000}}>
 
       {/* <OrbitControls></OrbitControls> */}
-      <Tile imgUrl={imgUrl} size={3.0}></Tile>
+      <Tile imgUrl={imgUrl} size={3.0} floorPlane={floorPlane}></Tile>
       <ambientLight intensity={5} />
       {/* <directionalLight position={[0,10,10]} /> */}
 
