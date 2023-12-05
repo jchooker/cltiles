@@ -16,14 +16,13 @@ export const Tile = (props) => {
     // const cubeRef = useRef();
     // const [isDragging, setDragging] = useState(false);
     const tileRef = useRef();
-    const { camera } = useThree();
+    const { camera, raycaster } = useThree();
     const { size, viewport } = useThree();
     const [pos, setPos] = useState([0, 1, 0]);
     const aspect = size.width / viewport.width;
     const [dragging, setDragging] = useState(false);
     const [mouseOffset, setMouseOffset] = useState({ x: 0, z: 0 });
 
-    let planeIntersectPoint = new THREE.Vector3();
     // useFrame(() => {
     //     if (tileRef.current) {
     //         tileRef.current.rotation.x += 0.01;
@@ -41,7 +40,16 @@ export const Tile = (props) => {
     //     config: { friction: 100 }
     // }));
     //V1-2 SPRING END
-    const [{x, y}, api] = useSpring(() => ({ x: 0, y: 0}));
+    //v4 start
+    // const [{x, y, z}, api] = useSpring(() => ({ x: 0, y: 0, z: 0 }));
+    //v4 end
+    //v5 start
+    const [{x, z}, api] = useSpring(() => ({
+        x: pos[0],
+        z: pos[2],
+        config: { friction: 20 }
+    }));
+    //v5 end
     const bind = useDrag(
         // ({ active, movement: [x, y], timeStamp, event }) => {
         //     if (active) {
@@ -85,13 +93,83 @@ export const Tile = (props) => {
         // }
         //END V2
         //V3
-        ({movement: [deltaX, deltaY], last}) => {
-            const newY = y.get() + deltaY / 100;
-            const newX = x.get() + deltaX / 100;
+        // ({movement: [deltaX, deltaY], last}) => {
+        //     const newY = y.get() + deltaY / 100;
+        //     const newX = x.get() + deltaX / 100;
 
-            api.start({ x: newX, y: newY });
-        }
+        //     api.start({ x: newX, y: newY });
+        // }
         //END V3
+        //start v4
+        // ({ down, movement: [mx, my]}) => {
+        //     const horizonDeg = 30;
+        //     const radAngle = (horizonDeg * Math.PI) / 180;
+        //     const planeX = mx * Math.cos(radAngle);
+        //     const planeY = my * Math.sin(radAngle);
+        //     //mvmt restriction
+        //     // const minX = 0;
+        //     // const minZ = 0;
+        //     const planeMagnitude = Math.sqrt(planeX**2 + planeY**2);
+        //     const maxX = 2;
+        //     const maxY = 2;
+        //     const maxZ = 2;
+        //     //Apply restriction
+        //     const newX = Math.max(-maxX, Math.min(maxX, planeX));
+        //     // const newY = my; //no restrictions on y needed?
+        //     const newY = Math.max(-maxY, Math.min(maxY, planeY));
+        //     const newZ = Math.max(-maxZ, Math.min(maxZ, planeMagnitude));
+
+        //     api.start({ x: down ? newX : 0, y: down ? newY : 0, immediate: down, z: down ? newZ : 0});
+
+        //     setPos([newX, newY, newZ]);
+        //     console.log(newX, newY, newZ);
+        // }
+        //end v4
+        //v5 start
+        ({ down, movement: [mx, mz] }) => {
+            const y = 1.5;
+            const sensitivity = 0.01;
+
+            console.log(x);
+            console.log(z);
+
+            const newX = x + mx * sensitivity;
+            const newZ = z - mz * sensitivity;
+            // if(down) {
+            //     console.log(pos[0], pos[1], pos[2]);
+            //     // event.THREE.Ray.intersectPlane(floorPlane, planeIntersectPoint);
+            //     raycaster.setFromCamera(
+            //         {
+            //             x: event.clientX / window.innerWidth,
+            //             y: event.clientY / window.innerHeight,
+            //         },
+            //         camera
+            //     );
+            //     const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+            //     const planeIntersectPoint = new THREE.Vector3();
+
+            //     raycaster.ray.intersectPlane(floorPlane, planeIntersectPoint);
+            //     setPos([planeIntersectPoint.x, 1.5, planeIntersectPoint.z]);
+            // }
+            const maxX = 5;
+            const maxZ = 5;
+
+            const clampedX = Math.max(-maxX, Math.min(maxX, newX));
+            console.log(clampedX);
+            const clampedZ = Math.max(-maxZ, Math.min(maxZ, newZ));
+            console.log(clampedZ);
+            setDragging(true);
+            api.start({
+                x: down ? clampedX : 0, 
+                z: down ? clampedZ : 0,
+                onUpdate: ({x, z}) => {
+                    setPos([x, y, z]);
+                    console.log(pos);
+                }
+            });
+            // setPos([clampedX, y, clampedZ]);
+        }
+        //v5 end
     );
 
     const handleMouseDown = (event) => {
@@ -196,9 +274,15 @@ export const Tile = (props) => {
                 // {...spring} {...bind()}
                 //v1-2 spring + bind end
                 //v3 start
-                {...bind()}
+                // {...bind()}
                 //v3 end
-                position={pos}
+                //v5 start
+                //style={{x, z}}
+                {...bind()}
+                //v5 end
+                //REACTIVATE POSITION??
+                // position={pos}
+                //REACTIVE POSITION^^??
                 ref={tileRef} 
                 // onDragStart={handleMouseDown}
                 // onDrag={handleMouseMove}
