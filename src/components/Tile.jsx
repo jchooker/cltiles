@@ -7,7 +7,7 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { shaderMaterial, Plane, useTexture, Decal } from '@react-three/drei';
 import { OrbitControls } from '@react-three/drei';
 // import {useDrag} from '@react-three/drei';
-import { useDrag } from "@use-gesture/react";
+import { useDrag, useGesture } from "@use-gesture/react";
 import { animated, useSpring } from '@react-spring/three';
 
 export const Tile = (props) => {
@@ -126,15 +126,15 @@ export const Tile = (props) => {
         // }
         //end v4
         //v5 start
-        ({ down, movement: [mx, mz] }) => {
+        ({ down, offset: [mx, mz] }) => {
             const y = 1.5;
-            const sensitivity = 0.01;
+            const sensitivity = 0.1;
 
-            console.log(x);
-            console.log(z);
+            console.log(x.get());
+            console.log(z.get());
 
-            const newX = x + mx * sensitivity;
-            const newZ = z - mz * sensitivity;
+            const newX = x.get() + mx * sensitivity;
+            const newZ = z.get() - mz * sensitivity;
             // if(down) {
             //     console.log(pos[0], pos[1], pos[2]);
             //     // event.THREE.Ray.intersectPlane(floorPlane, planeIntersectPoint);
@@ -155,49 +155,28 @@ export const Tile = (props) => {
             const maxZ = 5;
 
             const clampedX = Math.max(-maxX, Math.min(maxX, newX));
-            console.log(clampedX);
             const clampedZ = Math.max(-maxZ, Math.min(maxZ, newZ));
+            console.log(clampedX);
             console.log(clampedZ);
             setDragging(true);
             api.start({
                 x: down ? clampedX : 0, 
-                z: down ? clampedZ : 0,
-                onUpdate: ({x, z}) => {
-                    setPos([x, y, z]);
-                    console.log(pos);
-                }
+                z: down ? clampedZ : 0
+                // onUpdate: ({x, z}) => {
+                //     setPos([x.get(), y, z.get()]);
+                //     console.log(pos);
+                // setPos([clampedX, y, clampedZ]);
             });
-            // setPos([clampedX, y, clampedZ]);
-        }
+            setPos([clampedX, 1.5, clampedZ]);
+
+            if (tileRef.current) {
+                tileRef.current.position.x = clampedX;
+                tileRef.current.position.z = clampedZ;
+            }
+        },
+        {pointerEvents: true}
         //v5 end
     );
-
-    const handleMouseDown = (event) => {
-        setDragging(true);
-        const { clientX, clientZ } = event;
-        const { x, z } = tileRef.current.position;
-        setMouseOffset({ x: clientX - x, z: clientZ - z });
-    };
-
-    const handleMouseMove = (event) => {
-        if (!dragging) return;
-        const { clientX, clientZ } = event;
-        const newX = clientX - mouseOffset.x;
-        const newZ = clientZ - mouseOffset.z;
-        
-        // Set constraints for x and z
-        const minX = -5; // Adjust as needed
-        const maxX = 5; // Adjust as needed
-        const minZ = -5; // Adjust as needed
-        const maxZ = 5; // Adjust as needed
-
-        tileRef.current.position.x = Math.max(minX, Math.min(maxX, newX));
-        tileRef.current.position.z = Math.max(minZ, Math.min(maxZ, newZ));
-    };
-
-    const handleMouseUp = () => {
-        setDragging(false);
-    };
 
     //  tan sides
     const tileGeometry = new BoxGeometry(props.size, props.size/3.0, props.size);
@@ -283,7 +262,8 @@ export const Tile = (props) => {
                 //REACTIVATE POSITION??
                 // position={pos}
                 //REACTIVE POSITION^^??
-                ref={tileRef} 
+                ref={tileRef}
+                onPointerUp={()=> setDragging(false)} 
                 // onDragStart={handleMouseDown}
                 // onDrag={handleMouseMove}
                 // onDragEnd={handleMouseUp}
