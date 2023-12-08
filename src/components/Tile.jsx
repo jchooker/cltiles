@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MeshStandardMaterial,Mesh,BoxGeometry, 
     EdgesGeometry, LineSegments, LineBasicMaterial, MathUtils } from "three";
 import * as THREE from 'three';
-import { useLoader, useFrame, Canvas, extend, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { shaderMaterial, Plane, useTexture, Decal } from '@react-three/drei';
 import { OrbitControls } from '@react-three/drei';
@@ -20,6 +20,8 @@ export const Tile = (props) => {
 
     const lightTanColor = 0xe4d2ba;
     const darkBrownColor = 0x5c4033;
+
+    const a = new THREE.Vector3(0, 1, 0);
 
     const [{x, y, z}, api] = useSpring(() => ({
         x: pos[0],
@@ -41,12 +43,12 @@ export const Tile = (props) => {
 
             const newX = x.get() + mx * sensitivity*0.1;
             // const newY = y.get() + my * sensitivity;
-            const newZ = z.get() + mz * sensitivity * horizonAngle; //<-changed from mz to my
+            const newZ = z.get() + mz * sensitivity; //<-changed from mz to my
             console.log("mx: ", mx, "\n");
             console.log("my: ", mz, "\n");
 
-            const maxX = 5;
-            const maxZ = 10;
+            const maxX = 10;
+            const maxZ = 25;
 
             const clampedX = Math.max(-maxX, Math.min(maxX, newX));
             const clampedZ = Math.min(0, Math.max(-maxZ, newZ));
@@ -114,7 +116,8 @@ export const Tile = (props) => {
 
     useEffect(() => {
     // Set initial rotation values when component is mounted
-        tileRef.current.rotation.x = Math.PI / 6; // Tilt to the right
+        tileRef.current.rotation.x = Math.PI / 8; // Tilt to the right
+        tileRef.current.rotation.y = Math.PI; // Tilt to the right
     }, []);
 
     return (
@@ -124,8 +127,10 @@ export const Tile = (props) => {
                 ref={tileRef}
                 castShadow
             >
+                {/* <primitive object={a} /> */}
                 <primitive object={tileMesh}/>
                 <primitive object={edges}/>
+                <gridHelper args={[12, 12]} />
                 <axesHelper args={[5]} />
             </animated.mesh>
         </>
