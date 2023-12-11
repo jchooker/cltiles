@@ -5,12 +5,12 @@ import { useLoader, useThree } from '@react-three/fiber';
 import {Canvas} from '@react-three/fiber';
 import {Tile} from './components/Tile';
 import {CustomPlane} from './components/Plane';
-import {Plane} from '@react-three/drei';
+import {Plane, OrbitControls, OrthographicCamera} from '@react-three/drei';
 import './App.css';
 // import { OrbitControls } from '@react-three/drei';
 
   function calculatePosition(vanishingPoint, offset) {
-    const direction = new THREE.Vector3(-1, 0, -1);
+    const direction = new THREE.Vector3(0, 0, 0);
     const distance = Math.sqrt(
       Math.pow(vanishingPoint.x, 2) + Math.pow(vanishingPoint.y, 2)
     );
@@ -31,7 +31,7 @@ function App() {
   // useEffect(() => {
   //   set({camera: (THREE.MathUtils.degToRad(30),0,0)})
   // })
-  const [planeVanishingPoint, setPlaneVanishingPoint] = useState({x:0, y:5, z:-10});
+  const [planeVanishingPoint, setPlaneVanishingPoint] = useState({x:0, y:5, z:-5});
   const [initialized, setInitialized] = useState(false);
   const [position, setPosition] = useState(()=>calculatePosition(planeVanishingPoint, 0.5));
   //v1 begin
@@ -45,6 +45,7 @@ function App() {
     // newPosition.current = calculatePosition(planeVanishingPoint, 0.5);
     // if (newPosition.current) newPosition.current();
     newPosition.current.y = Math.abs(newPosition.current.y) * -1;
+    // newPosition.current.y = 50;
     newPosition.current.x = calculatePosition(planeVanishingPoint, 0.5).x;
     newPosition.current.z = calculatePosition(planeVanishingPoint, 0.5).z; 
     setPosition(calculatePosition(planeVanishingPoint, 0.5));
@@ -62,17 +63,46 @@ function App() {
   return (
     <>
       <Canvas
-        camera={{ position: [0, 0, 10], fov: 40, near: 0.01, far: 1000, rotation: [0.3, 0, 0]}}
-        // camera={{ position: [0, 0, 10], fov: 50, near: 0.1, far: 1000, rotation: (THREE.MathUtils.degToRad(30), 0, 0) }}
+        // camera={{ position: [0, 0, 50], fov: 40, near: 0.01, far: 1000, rotation: [0.3, 0, 0]}}
+        camera={{
+          position: [0, 10, -8],
+          fov: 50,
+          aspect: window.innerWidth / window.innerHeight,
+          near: 1,
+          far: 1000,
+          rotation: (0, 0, 0),
+        }}
         // onCreated={{ setCamState }}
       >
-        <plane args={[1, 1]}
+        <plane args={[1, 1]} />
+        <meshStandardMaterial
+          color={"orange"}
+          wireframe={false}
+          side={THREE.DoubleSide}
         />
-          <meshStandardMaterial color={"orange"} wireframe={false} side={THREE.DoubleSide}/>
         {/* <OrbitControls></OrbitControls> */}
-        <Tile imgUrl={imgUrl} size={3.0} position={newPosition.current} rotation={[Math.PI / 2, rotationAngle, 0]}></Tile>
+        <Tile
+          imgUrl={imgUrl}
+          size={3.0}
+          position={newPosition.current}
+          rotation={[0, 0, 0]}
+        ></Tile>
         <ambientLight intensity={5} />
         {/* <directionalLight position={[0,10,10]} /> */}
+        {/* <OrbitControls /> */}
+
+        {/* <OrthographicCamera
+          makeDefault
+          zoom={1}
+          top={20}
+          bottom={-20}
+          left={20}
+          right={-20}
+          near={1}
+          far={2000}
+          position={[0, 0, 10]}
+          rotation={[Math.PI / 6, rotationAngle, 10]}
+        /> */}
       </Canvas>
     </>
   );
