@@ -20,11 +20,20 @@ export const Tile = (props) => {
 
     const roundedRectShape = new Shape();
     const radius = props.size / 10;
-    roundedRectShape.moveTo(-props.size / 2, props.size / 6);
-    roundedRectShape.arc(-props.size / 6, props.size / 6, radius, 0, Math.PI / 2);
-    roundedRectShape.lineTo(props.size / 6, props.size / 2);
-    roundedRectShape.arc(props.size / 6, props.size / 6, radius, Math.PI / 2, Math.PI);
-    roundedRectShape.lineTo(-props.size / 2, props.size / 6);
+    const x1 = props.size/2;
+    const y1 = props.size/6;
+    //see roundedRectShape
+    roundedRectShape.moveTo( x1, y1 )
+        .quadraticCurveTo( x1 + 50, y1 - 80, x1 + 90, y1 - 10 )
+        .quadraticCurveTo( x1 + 100, y1 - 10, x1 + 115, y1 - 40 )
+        .quadraticCurveTo( x1 + 115, y1, x1 + 115, y1 + 40 )
+        .quadraticCurveTo( x1 + 100, y1 + 10, x1 + 90, y1 + 10 )
+        .quadraticCurveTo( x1 + 50, y1 + 80, x1, y1 );
+    // roundedRectShape.moveTo(-props.size / 2, props.size / 6);
+    // roundedRectShape.arc(-props.size / 6, props.size / 6, radius, 0, Math.PI / 2);
+    // roundedRectShape.lineTo(props.size / 6, props.size / 2);
+    // roundedRectShape.arc(props.size / 6, props.size / 6, radius, Math.PI / 2, Math.PI);
+    // roundedRectShape.lineTo(-props.size / 2, props.size / 6);
 
         
     // Create geometry for the top face using the rounded shape
@@ -140,9 +149,9 @@ export const Tile = (props) => {
                 castShadow
             >
                 {/* <primitive object={a} /> */}
-                {/* <primitive object={tileMesh}/>
-                <primitive object={edges}/> */}
+                {/* <primitive object={tileMesh}/> */}
                 <primitive object={topGeometry} />
+                <primitive object={edges}/>
                 <meshStandardMaterial attachArray="material" color={lightTanColor} />
                 <meshStandardMaterial attachArray="material" color={lightTanColor} />
                 <meshStandardMaterial attachArray="material" map={picTexture} />
