@@ -89,7 +89,7 @@ function App() {
         ></Tile>
         <ambientLight intensity={5} />
         {/* <directionalLight position={[0,10,10]} /> */}
-        {/* <OrbitControls /> */}
+        <OrbitControls />
 
         {/* <OrthographicCamera
           makeDefault
