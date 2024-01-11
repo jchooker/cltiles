@@ -20,27 +20,6 @@ export const Tile = (props) => {
     const [mouseOffset, setMouseOffset] = useState({ x: 0, z: 0 });
     const gltf = useLoader(GLTFLoader, '/src/assets/tilemodels/tile1.glb');
 
-    // const roundedRectShape = new Shape();
-    // const radius = props.size / 10;
-    // const x1 = props.size/2;
-    // const y1 = props.size/6;
-    //see roundedRectShape
-    // roundedRectShape.moveTo( x1, y1 )
-    //     .quadraticCurveTo( x1 + 50, y1 - 80, x1 + 90, y1 - 10 )
-    //     .quadraticCurveTo( x1 + 100, y1 - 10, x1 + 115, y1 - 40 )
-    //     .quadraticCurveTo( x1 + 115, y1, x1 + 115, y1 + 40 )
-    //     .quadraticCurveTo( x1 + 100, y1 + 10, x1 + 90, y1 + 10 )
-    //     .quadraticCurveTo( x1 + 50, y1 + 80, x1, y1 );
-    // roundedRectShape.moveTo(-props.size / 2, props.size / 6);
-    // roundedRectShape.arc(-props.size / 6, props.size / 6, radius, 0, Math.PI / 2);
-    // roundedRectShape.lineTo(props.size / 6, props.size / 2);
-    // roundedRectShape.arc(props.size / 6, props.size / 6, radius, Math.PI / 2, Math.PI);
-    // roundedRectShape.lineTo(-props.size / 2, props.size / 6);
-
-        
-    // Create geometry for the top face using the rounded shape
-    // const topGeometry = new ShapeGeometry(roundedRectShape);
-
     const lightTanColor = 0xe4d2ba;
     const darkBrownColor = 0x5c4033;
 
@@ -96,70 +75,8 @@ export const Tile = (props) => {
         //v5 end
     );
 
-    //  tan sides
-    // const tileGeometry = new BoxGeometry(props.size, props.size/3.0, props.size);
-
-    //edges:
-    // const edgesGeometry = new EdgesGeometry(tileGeometry);
-    // const edgesMaterial = new LineBasicMaterial({ color: darkBrownColor });
-    // const edges = new LineSegments(edgesGeometry, edgesMaterial);
-
-    // const picPreLoad = new THREE.TextureLoader();
-    // picPreLoad.crossOrigin = ""; //<--may have helped with pic not loading
-    // const picTexture = picPreLoad.load(props.imgUrl, undefined, undefined, (loader) => {
-    //     loader.precision = 8;
-    // });
-    // picTexture.anisotropy = THREE.renderer.capabilities.getMaxAnisotropy();
-    // picTexture.minFilter = THREE.LinearFilter;
-    // picTexture.magFilter = THREE.LinearFilter;
-    // picTexture.wrapS = THREE.RepeatWrapping;
-    // picTexture.wrapT = THREE.RepeatWrapping;
-    // picTexture.rotation = Math.PI / 2;
-
-  // Create materials for different faces of the box
-    // var materialArray = [];
-    // for (var i=0; i < 6; i++) {
-    //     var toPush;
-    //     if (i === 2) {
-    //         toPush = new MeshStandardMaterial({map: picTexture});
-    //         toPush.alphaTest = 0.5; // You may need to adjust this threshold based on your image
-    //         // toPush.transparent = true;
-    //         toPush.color = new THREE.Color(1, 1, 1); // White color for the background
-    //         // const darkeningFactor = 0.7;
-    //         // toPush.color = new THREE.Color(darkeningFactor, darkeningFactor, darkeningFactor);
-    //     } else {
-    //         toPush = new MeshStandardMaterial({color: lightTanColor});
-    //     }    
-    //     materialArray.push(toPush);
-    // }
-
-    // console.log(tileGeometry);
-
-    // const tileMesh = new Mesh(topGeometry, materialArray);
-
-    // useEffect(() => {
-    // // Set initial rotation values when component is mounted
-    //     tileRef.current.rotation.x = Math.PI / 8; // Tilt to the right
-    //     tileRef.current.rotation.y = Math.PI; // Tilt to the right
-    // }, []);
-
     return (
         <>
-            {/* <animated.mesh 
-                {...bind()}
-                ref={tileRef}
-                castShadow */}
-            {/* > */}
-                {/* <primitive object={a} /> */}
-                {/* <primitive object={tileMesh}/> */}
-                {/* <primitive object={topGeometry} />
-                <primitive object={edges}/>
-                <meshStandardMaterial attachArray="material" color={lightTanColor} />
-                <meshStandardMaterial attachArray="material" color={lightTanColor} />
-                <meshStandardMaterial attachArray="material" map={picTexture} />
-                <meshStandardMaterial attachArray="material" color={lightTanColor} />
-                <meshStandardMaterial attachArray="material" color={lightTanColor} />
-                <meshStandardMaterial attachArray="material" color={lightTanColor} /> */}
                 <primitive object={gltf.scene} />
                 <gridHelper args={[12, 12]} />
                 <axesHelper args={[5]} />
